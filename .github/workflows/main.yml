@@ -11,7 +11,6 @@ jobs:
     - uses: actions/setup-node@v4
       with:
         node-version: 18
-    - run: npm install
     - run: node ado_report_simple.js "${{ secrets.ADO_PAT }}" "TR-DataAndAnalytics" "Data-Strategy-and-Insights" "Customer Service & Support"
     - uses: dawidd6/action-send-mail@v3
       with:
@@ -21,4 +20,4 @@ jobs:
         password: ${{ secrets.OUTLOOK_PASSWORD }}
         subject: Azure DevOps Intake Report
         to: paula.szczygiel@thomsonreuters.com
-        html_body: Report generated successfully
+        html_body: Report generated
