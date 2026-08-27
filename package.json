@@ -1,0 +1,8 @@
+json
+{
+  "name": "ado-report",
+  "version": "1.0.0",
+  "description": "Azure DevOps Intake Report",
+  "main": "ado_report_simple.js",
+  "dependencies": {}
+}
