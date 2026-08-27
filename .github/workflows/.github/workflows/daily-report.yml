@@ -3,9 +3,8 @@ name: Daily ADO Intake Report
 
 on:
   schedule:
-    # 7 AM UTC every day (adjust timezone if needed)
     - cron: '0 7 * * *'
-  workflow_dispatch: # Allows manual trigger
+  workflow_dispatch:
 
 jobs:
   generate-report:
@@ -19,22 +18,14 @@ jobs:
         with:
           node-version: '18'
       
-      - name: Install dependencies
-        run: npm install
-      
       - name: Generate ADO Report
-        run: |
-          node ado_report_simple.js \
-            "${{ secrets.ADO_PAT }}" \
-            "TR-DataAndAnalytics" \
-            "Data-Strategy-and-Insights" \
-            "Customer Service & Support"
+        run: node ado_report_simple.js "${{ secrets.ADO_PAT }}" "TR-DataAndAnalytics" "Data-Strategy-and-Insights" "Customer Service & Support"
       
       - name: Read HTML Report
         id: read_html
         run: |
           if [ -f ado_report_*.html ]; then
-            CONTENT=$(cat ado_report_*.html | jq -Rs .)
+            CONTENT=$(cat ado_report_*.html)
             echo "content=$CONTENT" >> $GITHUB_OUTPUT
           fi
       
@@ -45,6 +36,6 @@ jobs:
           server_port: 587
           username: ${{ secrets.OUTLOOK_EMAIL }}
           password: ${{ secrets.OUTLOOK_PASSWORD }}
-          subject: 'Azure DevOps Intake Report'
+          subject: 'Azure DevOps Intake Report - ${{ github.event.repository.updated_at }}'
           to: paula.szczygiel@thomsonreuters.com
           html_body: ${{ steps.read_html.outputs.content }}
