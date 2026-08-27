@@ -1,39 +1,30 @@
 yaml
 name: ADO Daily Report
-
 on:
-  workflow_dispatch:
+  workflow_dispatch: null
   schedule:
-    - cron: '0 7 * * *'
-
+  - cron: 0 7 * * *
 jobs:
   report:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
-      
-      - uses: actions/setup-node@v3
-        with:
-          node-version: '18'
-      
-      - name: Generate Report
-        run: node ado_report_simple.js "${{ secrets.ADO_PAT }}" "TR-DataAndAnalytics" "Data-Strategy-and-Insights" "Customer Service & Support"
-      
-      - name: Read HTML
-        id: html
-        run: |
-          if [ -f ado_report_*.html ]; then
-            CONTENT=$(cat ado_report_*.html)
-            echo "content=$CONTENT" >> $GITHUB_OUTPUT
-          fi
-      
-      - name: Send Email
-        uses: dawidd6/action-send-mail@v3
-        with:
-          server_address: smtp.office365.com
-          server_port: 587
-          username: ${{ secrets.OUTLOOK_EMAIL }}
-          password: ${{ secrets.OUTLOOK_PASSWORD }}
-          subject: 'Azure DevOps Intake Report'
-          to: paula.szczygiel@thomsonreuters.com
-          html_body: ${{ steps.html.outputs.content }}
+    - uses: actions/checkout@v3
+    - uses: actions/setup-node@v3
+      with:
+        node-version: '18'
+    - run: node ado_report_simple.js "${{ secrets.ADO_PAT }}" "TR-DataAndAnalytics" "Data-Strategy-and-Insights" "Customer Service & Support"
+    - id: html
+      run: |
+        if [ -f ado_report_*.html ]; then
+          CONTENT=$(cat ado_report_*.html)
+          echo "content=$CONTENT" >> $GITHUB_OUTPUT
+        fi
+    - uses: dawidd6/action-send-mail@v3
+      with:
+        server_address: smtp.office365.com
+        server_port: 587
+        username: ${{ secrets.OUTLOOK_EMAIL }}
+        password: ${{ secrets.OUTLOOK_PASSWORD }}
+        subject: Azure DevOps Intake Report
+        to: paula.szczygiel@thomsonreuters.com
+        html_body: ${{ steps.html.outputs.content }}
