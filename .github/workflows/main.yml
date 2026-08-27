@@ -1,4 +1,4 @@
-yaml
+
 name: ADO Report
 on:
   workflow_dispatch:
