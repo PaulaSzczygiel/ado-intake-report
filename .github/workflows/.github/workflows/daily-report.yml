@@ -1,0 +1,50 @@
+yaml
+name: Daily ADO Intake Report
+
+on:
+  schedule:
+    # 7 AM UTC every day (adjust timezone if needed)
+    - cron: '0 7 * * *'
+  workflow_dispatch: # Allows manual trigger
+
+jobs:
+  generate-report:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - uses: actions/checkout@v3
+      
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '18'
+      
+      - name: Install dependencies
+        run: npm install
+      
+      - name: Generate ADO Report
+        run: |
+          node ado_report_simple.js \
+            "${{ secrets.ADO_PAT }}" \
+            "TR-DataAndAnalytics" \
+            "Data-Strategy-and-Insights" \
+            "Customer Service & Support"
+      
+      - name: Read HTML Report
+        id: read_html
+        run: |
+          if [ -f ado_report_*.html ]; then
+            CONTENT=$(cat ado_report_*.html | jq -Rs .)
+            echo "content=$CONTENT" >> $GITHUB_OUTPUT
+          fi
+      
+      - name: Send Email via Outlook
+        uses: dawidd6/action-send-mail@v3
+        with:
+          server_address: smtp.office365.com
+          server_port: 587
+          username: ${{ secrets.OUTLOOK_EMAIL }}
+          password: ${{ secrets.OUTLOOK_PASSWORD }}
+          subject: 'Azure DevOps Intake Report'
+          to: paula.szczygiel@thomsonreuters.com
+          html_body: ${{ steps.read_html.outputs.content }}
