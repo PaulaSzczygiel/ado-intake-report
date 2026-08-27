@@ -18,6 +18,7 @@ jobs:
         server_port: 587
         username: ${{ secrets.OUTLOOK_EMAIL }}
         password: ${{ secrets.OUTLOOK_PASSWORD }}
-        subject: Azure DevOps Intake Report
+        from: paula.szczygiel@thomsonreuters.com
         to: paula.szczygiel@thomsonreuters.com
+        subject: Azure DevOps Intake Report
         html_body: Report generated
